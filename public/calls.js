@@ -7,23 +7,33 @@ document.getElementById("trans_button").onclick = translate;
 
 var typingTimer;
 text_input.addEventListener('keyup', () => {
-    console.log("Event Fired");
     clearTimeout(typingTimer);
     if (text_input.value){
         typingTimer = setTimeout(translate, 1000);
     }
 });
 
+api_input.addEventListener('input', () => {
+    if (api_input.value != ""){
+        alert_box.style.display = "none";
+    } else {
+        alert_box.style.display = "block";
+    }
+});
+
 async function translate(){
-    console.log("this is called");
     if (!api_input.value){
         console.log("No Key entered");
         alert_box.innerHTML = "Please enter DeepL-API Key!"
         alert_box.style.display = "block";
     } else {
-        alert_box.style.display = "none";
-        var data = await api_call();
-        text_output.value = data.text;    
+        var data;
+        try{
+            data = await api_call();
+            text_output.value = data.text;
+        } catch (e){
+            console.log(e);
+        }   
     }
 }
 
@@ -33,16 +43,23 @@ async function api_call(){
         'key': api_input.value
     }
     var url = "";
-    var res = await fetch(url, {
+    return fetch(url, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
           },
         body: JSON.stringify(req_data)
+    }).then((response) => {
+        if (!response.ok){
+            console.log(response.status)
+            alert_box.innerHTML = "Authorization failed. Please supply a valid API Key."
+            alert_box.style.display = "block";
+            throw new Error(`HTTP error! Status: ${ response.status }`);
+        }
+        return response.json();
+    }).then((data) => {
+        return data;
+    }).catch((error) => {
+        console.log(error);
     });
-    return await res.json();
-}
-
-function isItRuning(){
-    console.log("HAAAAAAAAAAAALOO")
 }

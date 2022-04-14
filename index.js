@@ -1,7 +1,7 @@
 const express = require('express');
 const path = require('path');
 const fetch = require('node-fetch');
-const { debug } = require('console');
+const { URLSearchParams } = require('url');
 
 const app = express();
 
@@ -12,14 +12,20 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.post('/', async (req, res) => {
     var url = 'https://api-free.deepl.com/v2/translate';
-    key = req.body.key;
-    text = req.body.text;
+    body_url = new URLSearchParams({
+        'auth_key': req.body.key,
+        'text': req.body.text,
+        'source_lang': 'DE',
+        'target_lang': 'EN',
+        'tag_handling': 'html',
+    });
+    console.log(body_url);
     return fetch(url, {
     method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
         },
-        body:`auth_key=${key}&text=${text}&source_lang=DE&target_lang=EN&tag_handling`
+        body: body_url
     }).then((response) => {
         if (!response.ok) {
             res.status(403).send("403");

@@ -4,6 +4,7 @@ const fetch = require('node-fetch');
 const { URLSearchParams } = require('url');
 
 const app = express();
+const port = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -39,4 +40,4 @@ app.post('/', async (req, res) => {
     });
 });
 
-app.listen(3000, () => console.log("Server started on port 3000"));
+app.listen(port, () => console.log("Server started on port 3000"));
